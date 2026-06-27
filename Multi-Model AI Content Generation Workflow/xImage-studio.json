@@ -1,0 +1,2345 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer [ADD_YOUR_HIGGSFIELD_API_KEY]"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"nano-banana-2\",\n  \"callBackUrl\": \"https://your-domain.com/api/callback\",\n  \"input\": {\n    \"prompt\": \"{{ $json.prompt }}\",\n    \"image_input\": [],\n    \"aspect_ratio\": \"auto\",\n    \"resolution\": \"1K\",\n    \"output_format\": \"png\"\n  }\n} ",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "90a1a8ab-b838-4d63-a268-1f97b9dc2361",
+      "name": "Generate Image3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        496
+      ],
+      "id": "64c6f6ec-c3ba-4075-bea1-a295da1df06a",
+      "name": "Wait",
+      "webhookId": "dbe5cfbc-e70f-4103-9524-1f49a9bfc5ec"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "=taskId",
+              "value": "={{ $json.data.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer [ADD_YOUR_HIGGSFIELD_API_KEY]"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "46881d30-7a62-4450-b727-f983b84e3df7",
+      "name": "Generate Image4",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        432,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a20a7541-cd30-41b6-8235-f48d0cd04d63",
+              "name": "data.resultJson",
+              "value": "={{ $json.data.resultJson }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3136,
+        240
+      ],
+      "id": "8a399d16-9d82-4b65-92b0-1a11a0bcdf72",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "success",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cd4e9967-2db5-45c7-b2d1-da704179ba3b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "success"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "19aaf3e6-dc66-4186-ab9e-0a7a591cfffa",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "waiting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "waiting"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f7b8302c-938e-41ad-9d92-4ba84cdabfc7",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "fail",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        464
+      ],
+      "id": "17a157a6-15bb-49b0-8ba2-a430efb156b9",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a20a7541-cd30-41b6-8235-f48d0cd04d63",
+              "name": "prompt",
+              "value": "={{ $json.Prompt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -224,
+        496
+      ],
+      "id": "a07779b5-673a-479e-af7f-945b06606a29",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "content": "# YouTube Thumbnail\n### (script-to-Image)(gpt-image-2)\n**content-script -> gen-prompt -> gen-img -> base64-to-img**",
+        "height": 416,
+        "width": 1600,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "2d44a6a5-7f5e-47bb-9052-41029c9f07d6",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=write for me a prompt to generate Youtube Thumbnail for this text:\n{{ $json[\"content script\"] }}",
+        "options": {
+          "systemMessage": ""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        16,
+        -48
+      ],
+      "id": "83cf4410-8282-49f3-a5f2-4799f191a22a",
+      "name": "sm-post"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        96,
+        176
+      ],
+      "id": "1f5db9a5-0261-4299-810c-25a314bfb465",
+      "name": "gpt-40-mini",
+      "credentials": {
+        "openRouterApi": {
+          "id": "[ADD_YOUR_OPENROUTER_CREDENTIAL_ID]",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/generations",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-2"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "quality",
+              "value": "high"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2ba2377e-225f-48d5-849f-b364bdcb9d48",
+      "name": "gen-img",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        400,
+        16
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "[ADD_YOUR_OPENAI_CREDENTIAL_ID]",
+          "name": "OpenAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data[0].b64_json",
+        "options": {}
+      },
+      "id": "e7443c92-f42a-4755-bf0a-30de0496a102",
+      "name": "base64-to-png",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        3104,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Travel Map\n### (prompt-to-image)(nano-bannana)\n**prompt -> gen-img-request -> wait -> status -> img-link**",
+        "height": 416,
+        "width": 1600,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        336
+      ],
+      "typeVersion": 1,
+      "id": "506a4660-076e-4b8f-945a-df02e925f71e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        160,
+        1008
+      ],
+      "id": "5577d7f7-d13a-432b-a8a7-9ef596d3d0e5",
+      "name": "Wait1",
+      "webhookId": "dbe5cfbc-e70f-4103-9524-1f49a9bfc5ec"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "success",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cd4e9967-2db5-45c7-b2d1-da704179ba3b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "success"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "19aaf3e6-dc66-4186-ab9e-0a7a591cfffa",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "waiting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "waiting"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f7b8302c-938e-41ad-9d92-4ba84cdabfc7",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "fail",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        992
+      ],
+      "id": "3c5d940c-f144-4706-a9af-736f5d8c17db",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer [ADD_YOUR_HIGGSFIELD_API_KEY]"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"gemini-omni-video\",\n    \"input\": {\n    \"prompt\": \"{{ $json.prompt }}\",\n   \"image_urls\": [\"{{ $json['img-url'] }}\"],\n        \"duration\": \"4\",\n        \"resolution\": \"1080p\",\n        \"aspect_ratio\": \"9:16\"\n    }\n} ",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "b5688106-5f63-4ce5-9bb2-c60c7d20856f",
+      "name": "gen-video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -96,
+        1008
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $json.data.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer [ADD_YOUR_HIGGSFIELD_API_KEY]"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "fba590a3-bbfa-431e-822c-93282656d6d8",
+      "name": "get-status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        400,
+        1008
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Omni Video \n### (Gemini-omni)(prompt-to-video)\n**prompt -> gen-video-request -> wait  -> status -> video-link**",
+        "height": 400,
+        "width": 1600,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        816
+      ],
+      "typeVersion": 1,
+      "id": "9bc35139-8bab-4ce7-9f98-537649493fca",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a20a7541-cd30-41b6-8235-f48d0cd04d63",
+              "name": "prompt",
+              "value": "=You are an elite cinematic advertising creative director Your task is to generate an outro for an advertising video for a Wedding Ring Wood Box shown in the attached image Product Input Product Image Attached Product Name Wedding Ring Wood Box Use Occasion Wedding Target Audience Algerian women interested in gifts handcrafted products and natural wood aesthetics Create a final cinematic outro scene lasting 4 seconds including detailed camera movements and angles lighting mood atmosphere product placement visual focus and background elements that enhance luxury and romance Include onscreen text in both French and Arabic a strong emotional ending that emphasizes love commitment elegance and craftsmanship and a premium call to action suitable for social media advertising Describe the scene in a way that can be directly used by AI video generation tools such as Veo Runway or Kling The style should be a luxury wedding commercial with ultra realistic visuals cinematic depth of field warm golden hour lighting highlighted natural wood textures a romantic and emotional atmosphere high end product advertising aesthetics 4K quality smooth camera motion elegant typography and a premium brand feel The outro should end with a close up of the wooden ring box opening slowly and revealing the wedding rings. note do not text in the video do not change the product appearane.",
+              "type": "string"
+            },
+            {
+              "id": "3fb2a888-d448-4ea3-aa3b-25189a0820bb",
+              "name": "img-url",
+              "value": "[ADD_YOUR_IMAGE_URL]",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -272,
+        1008
+      ],
+      "id": "274f862f-1d1c-44b3-87de-f7c5dbaf47f3",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "content": "# Educational imgs\n### (script-to-Image)(gpt-image-2)\n**gen-prompt -> gen-img -> base64-to-img**",
+        "height": 416,
+        "width": 1600,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        784,
+        -1472
+      ],
+      "typeVersion": 1,
+      "id": "0dd8a0cf-c87d-451a-97e6-fa5bc999f0d6",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/generations",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-2"
+            },
+            {
+              "name": "prompt",
+              "value": "Clean educational technical illustration, hand-drawn ink style on lined notebook paper, centered subject: {s22-ultra-mobo}. The object is shown in a clear 3/4 perspective or side view, simplified engineering diagram style with precise outlines and minimal shading. Add numbered callouts pointing to key components (1, 2, 3, 4, etc.) with thin arrows. Include a structured legend below the drawing explaining each labeled part in short clear definitions. Title at the top in uppercase: \"PARTS OF A {s22-ultra-mobo}\". Use consistent blue pen ink style, clean line work, educational schematic aesthetic, highly legible, organized spacing, minimal artistic noise, no photorealism, no background clutter, notebook paper texture visible, technical diagram, instructional infographic style, professional engineering sketch quality."
+            },
+            {
+              "name": "quality",
+              "value": "high"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c8e7cc05-fbec-477e-b5f6-24c3731265c9",
+      "name": "gen-img1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1152,
+        -1328
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "[ADD_YOUR_OPENAI_CREDENTIAL_ID]",
+          "name": "OpenAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# image scaner\n### (image-to-prompt)\n**img + prompt -> prompt**",
+        "height": 416,
+        "width": 1600,
+        "color": "#000000"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2080,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "9adc4a04-c9bb-48a6-86d1-8ea0105b4c46",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-5.4\",\n  \"input\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"input_text\",\n          \"text\": \"{{ $json.prompt }}\"\n        },\n        {\n          \"type\": \"input_image\",\n          \"image_url\": \"{{ $json[\"img-url\"] }}\"\n        }\n      ]\n    }\n  ]\n} ",
+        "options": {}
+      },
+      "id": "91fd304a-dcfc-49e8-99f6-7611ba7a9511",
+      "name": "gen-img2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1296,
+        32
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "[ADD_YOUR_OPENAI_CREDENTIAL_ID]",
+          "name": "OpenAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "01024a06-30c1-46ed-9887-e91a31ad33db",
+              "name": "prompt",
+              "value": "You are an expert visual systems analyst and prompt engineer.  Your task is to analyze the image and reverse-engineer its visual design system. follow this process: Scan and extract the dominant illustration style (line style, shading, texture, medium, color system, perspective, composition, background type). Identify the structural layout rules (labels, numbering system, arrows, legends, title placement, spacing, hierarchy). Detect the drawing conventions (hand-drawn vs digital, ink type, sketch cleanliness, educational style, realism level). Generalize everything into a reusable \"style blueprint\" that is NOT tied to the specific object in the image. Then output a single dynamic prompt template that can be reused to generate new images in the exact same style for any subject. OUTPUT FORMAT (strict): ready to copy prompt (no additional text) with a {SUBJECT} placeholder only. RULES: Do not describe the specific image content in the final template Do not include explanations outside the required format The template must be universal and reusable Keep the prompt optimized for AI image generation systems Focus heavily on consistency, layout, labeling system, and illustration aesthetics",
+              "type": "string"
+            },
+            {
+              "id": "e7ae2232-0d8e-4d8d-a2c8-8be9ff228fd8",
+              "name": "img-url",
+              "value": "[ADD_YOUR_REFERENCE_IMAGE_URL]",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1712,
+        32
+      ],
+      "id": "7c820ae6-3e23-4e3d-a7e9-621251b3a5f0",
+      "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "content": "# x-imgs\n### (script-to-Image)(gpt-image-2)\n**IMG-SCANER -> gen-img -> base64-to-img**",
+        "height": 416,
+        "width": 1600,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        784,
+        -576
+      ],
+      "typeVersion": 1,
+      "id": "fadb5b88-cf33-438a-a744-2e6f712cce9d",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/generations",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-2"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "quality",
+              "value": "high"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ad181aad-3463-4783-8084-f1f157eced73",
+      "name": "gen-img3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1680,
+        -416
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "[ADD_YOUR_OPENAI_CREDENTIAL_ID]",
+          "name": "OpenAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Replace [SUBJECT] in the prompt with \"with a realistic example subject\" Do not modify, rewrite, optimize, reorder, shorten, expand, or remove any other part of the prompt. Output only the final prompt with the subject inserted and no additional text, explanations, formatting, comments, quotation marks, or code blocks.\nprompt:\n{{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        976,
+        -416
+      ],
+      "id": "be9ed102-3e65-4228-bcde-366ddfd660e8",
+      "name": "edit-prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "01024a06-30c1-46ed-9887-e91a31ad33db",
+              "name": "prompt",
+              "value": "A high-end cinematic editorial portrait transforming my pic. The aesthetic is a dark, moody fusion of Neo-Noir and futuristic Cyberpunk. The subject is dramatically lit by fragmented, motivated colored neon light sources (electric blue and magenta) reflecting off wet skin. Strong teal and amber color grading defines the mood. Set in a rain-streaked futuristic metropolis at night. The depth of field is very shallow, featuring intricate, blurred futuristic advertisements with distinct oval bokeh. Shot on a 35mm anamorphic lens with cinematic flare, volumetric fog, and high texture detail. Dynamic, narrative lighting. 8k resolution.",
+              "type": "string"
+            },
+            {
+              "id": "e7ae2232-0d8e-4d8d-a2c8-8be9ff228fd8",
+              "name": "img-1",
+              "value": "[ADD_YOUR_PORTRAIT_IMAGE_URL]",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1248,
+        -832
+      ],
+      "id": "1e7f3689-3490-4fcb-a2f6-12703738fa07",
+      "name": "Edit Fields7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/edits",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-image-2\",\n  \"prompt\": \"{{ $json.prompt }}\",\n  \"images\": [\n    { \"image_url\": \"{{ $json['img-1'] }}\" }\n  ],\n  \"quality\": \"high\"\n}",
+        "options": {}
+      },
+      "id": "13e5f58a-f9a6-4861-9ae7-78954deaa8da",
+      "name": "gen-img4",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1680,
+        -832
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "[ADD_YOUR_OPENAI_CREDENTIAL_ID]",
+          "name": "OpenAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# portrait-img\n### (script-to-Image)(gpt-image-1.5)\n**img+prompt -> gen-img -> base64-to-img**",
+        "height": 416,
+        "width": 1600,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        784,
+        -1024
+      ],
+      "typeVersion": 1,
+      "id": "70079b81-5ca3-4205-b490-fcbd49893cc2",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "01024a06-30c1-46ed-9887-e91a31ad33db",
+              "name": "video-script",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -288,
+        16
+      ],
+      "id": "ece4b8c2-fe5d-4e7e-8499-7684dc99478d",
+      "name": "Edit Fields8"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/generations",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-2"
+            },
+            {
+              "name": "prompt",
+              "value": "=generate for me youtube thumbnail for this video.\ncontent: {{ $json.content }}\nstyle: Editorial poster design centered around abstract AI workflow diagrams, software interface elements, automation nodes, image and video generation icons, and typography-driven composition. No humans, no faces, no portraits, no body parts, no silhouettes, no characters, no people. Bold modern magazine-style composition, off-white paper background with subtle grain, dust, speckle, and distressed print texture. High-contrast black-and-white halftone treatment applied only to graphic elements and interface components. Large asymmetrical focal object made of interconnected automation workflows, AI symbols, creative studio assets, and futuristic UI panels, outlined with a thick electric-blue stroke/glow contour.\n\nOversized condensed sans-serif headline block on the opposite side in stacked uppercase text, black and vivid blue typography with strong scale contrast. Swiss-inspired grid mixed with chaotic collage accents. Minimal color palette limited to black, white, cream, and bright electric blue. Clean digital collage with print editorial aesthetics, sharp edges, posterized shading, halftone dots, no realistic depth, flat frontal layout, spacious negative space.\n\nScattered microtext captions, annotation snippets, technical labels, quote fragments, tiny interface-like elements, decorative arrows, dashed hand-drawn motion lines, toggle symbols, workflow connectors, miniature labels, footer marks, and UI callouts. Strict hierarchy with dominant title, secondary callouts, and tertiary micro-details. Top-corner branding-style text. Balanced yet intentionally fragmented layout. Contemporary technology-journal poster, ultra-detailed typography composition, screen-printed zine texture, high resolution, fashionable graphic design, premium editorial art direction.\n\nNegative prompt: human, person, face, portrait, head, eyes, hands, body, silhouette, character, model, influencer, selfie, photograph of person, realistic human, crowd, anatomy, people, avatar.\n"
+            },
+            {
+              "name": "quality",
+              "value": "high"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "03d18045-0e76-4a7c-bb1c-c04d7be72b9f",
+      "name": "gen-img5",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        176,
+        -384
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "[ADD_YOUR_OPENAI_CREDENTIAL_ID]",
+          "name": "OpenAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "01024a06-30c1-46ed-9887-e91a31ad33db",
+              "name": "content",
+              "value": "i am open to work and you can check my website or reach me on upwork. for website development or digital marekting ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        -384
+      ],
+      "id": "dee83327-0280-4816-b9e1-7003ed0b8a41",
+      "name": "Edit Fields9"
+    },
+    {
+      "parameters": {
+        "content": "# YouTube Thumbnail\n### (script-to-Image)(gpt-image-2)\n**content-script -> gen-img -> base64-to-img**",
+        "height": 416,
+        "width": 1184,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        -576
+      ],
+      "typeVersion": 1,
+      "id": "e2db5404-6cb5-4ea4-aed3-af8d79f780b7",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "89b3624e-892c-43f1-b144-50692b59daaa",
+              "name": "system",
+              "value": "={{ $json.body.category }}",
+              "type": "string"
+            },
+            {
+              "id": "0251fea9-bfc0-4ffa-b505-268bb83d4eb7",
+              "name": "Prompt",
+              "value": "={{ $json.body.prompt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2288,
+        -1232
+      ],
+      "id": "f9fb46ad-0a00-478c-ab1a-bffe6341ef27",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.system }}",
+                    "rightValue": "img-scanner",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "464abf20-efae-4c97-8239-0288f8f14fc2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "img-scanner"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "809c955d-bc42-46cf-b3b1-168bfccd9e97",
+                    "leftValue": "={{ $json.system }}",
+                    "rightValue": "x-yt-thumb",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "x-yt-thumb"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d4c17ded-a2ba-44af-952c-c9c511d82e7d",
+                    "leftValue": "={{ $json.system }}",
+                    "rightValue": "yt-thumb-agent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "=yt-thumb-agent"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4167ab43-4b16-4e19-95a8-5c293fed55da",
+                    "leftValue": "={{ $json.system }}",
+                    "rightValue": "travel-map",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "travel-map"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2fdabad1-1c69-4703-b48e-b15b25f01339",
+                    "leftValue": "={{ $json.system }}",
+                    "rightValue": "portrait-img",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "portrait-img"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8de7492e-d955-4aa3-b5ca-803c9084508d",
+                    "leftValue": "={{ $json.system }}",
+                    "rightValue": "learn-img",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "learn-img"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b2522125-2d56-47a4-8772-09cf8af57fe3",
+                    "leftValue": "={{ $json.system }}",
+                    "rightValue": "omni",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "omni"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7ca9a292-742f-404d-b725-bee1e5a8fbab",
+                    "leftValue": "={{ $json.system }}",
+                    "rightValue": "inter-design",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "inter-design"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a3a38c87-723f-4e55-9210-de55142a7af9",
+                    "leftValue": "={{ $json.system }}",
+                    "rightValue": "product",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "product"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1952,
+        -1344
+      ],
+      "id": "688eaddb-9b49-42bd-8509-44a9eb66788d",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.data.resultJson;\nconst parsed = JSON.parse(raw);\nconst url = parsed.resultUrls[0];\n\nreturn [{ json: { url: url } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3344,
+        240
+      ],
+      "id": "3f6dddf6-5d82-41ee-a8d5-c5e89c3332cb",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "name": "={{ $now.format('yyyy-MM-dd_HH-mm') }}-{{ $('Edit Fields4').item.json.system }}.png",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "[ADD_YOUR_GOOGLE_DRIVE_FOLDER_ID]",
+          "mode": "list",
+          "cachedResultName": "n8n-output",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/[ADD_YOUR_GOOGLE_DRIVE_FOLDER_ID]"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3808,
+        240
+      ],
+      "name": "Upload to Drive",
+      "id": "b2452e09-222c-40aa-86e0-c46a5b7a2322",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "[ADD_YOUR_GOOGLE_DRIVE_CREDENTIAL_ID]",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3584,
+        352
+      ],
+      "name": "Download File",
+      "id": "dc5a4928-5dc2-41cb-b88d-c3b3d6b61893"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer [ADD_YOUR_HIGGSFIELD_API_KEY]"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"nano-banana-2\",\n  \"callBackUrl\": \"https://your-domain.com/api/callback\",\n  \"input\": {\n    \"prompt\": \"{{ $json.prompt }}\",\n    \"image_input\": [\"{{ $json['img-link'] }}\"],\n    \"aspect_ratio\": \"auto\",\n    \"resolution\": \"1K\",\n    \"output_format\": \"png\"\n  }\n} ",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "221e81d9-6e96-4978-af50-fe64fdacb3bf",
+      "name": "Generate Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        1408
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        1408
+      ],
+      "id": "9d1f50ba-10c1-4336-8a98-89a217395e47",
+      "name": "Wait2",
+      "webhookId": "dbe5cfbc-e70f-4103-9524-1f49a9bfc5ec"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "=taskId",
+              "value": "={{ $json.data.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer [ADD_YOUR_HIGGSFIELD_API_KEY]"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "968a6cad-52ce-4b58-ab64-074da2f01c1a",
+      "name": "Generate Image5",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        432,
+        1408
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "success",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cd4e9967-2db5-45c7-b2d1-da704179ba3b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "success"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "19aaf3e6-dc66-4186-ab9e-0a7a591cfffa",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "waiting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "waiting"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f7b8302c-938e-41ad-9d92-4ba84cdabfc7",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "fail",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        1376
+      ],
+      "id": "e7883a6c-be54-4f90-940e-c330eafc33e8",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a20a7541-cd30-41b6-8235-f48d0cd04d63",
+              "name": "prompt",
+              "value": "=You are an expert AI Interior Designer Architect and Spatial Planner Your task is to analyze the provided reference image of an unfinished or raw architectural space and transform it into a high end realistically rendered and fully finished interior design concept Follow this systematic step by step workflow to generate the final output First Spatial and Structural Analysis Break down the existing architecture from the image Identify the structural bones such as double height ceilings mezzanine levels staircase placement load bearing columns open floor plans Map out natural light sources including window positions direction of sunlight and shadow behavior across surfaces Identify fixed elements that cannot be moved such as concrete stairs structural openings or fixed window frames ensuring they remain accurate in the final design Second Material and Surface Refinement Upgrade the raw surfaces while preserving the core structure Replace flooring with high quality finishes such as large format porcelain tiles polished concrete micro cement or premium hardwood planks specifying tone texture and finish Treat walls with premium materials such as smooth gypsum plaster in neutral tones accent wood paneling or refined architectural concrete Define ceiling treatments such as gypsum drop ceilings with integrated lighting shadow gaps hidden LED tracks or exposed refined beams depending on the intended style Upgrade staircase and openings using materials such as floating wood treads marble slabs or micro cement and define railings such as frameless glass or matte black steel systems Third Layout Optimization and Furnishing Organize the space based on architectural function Divide open areas into clear zones such as living lounge reading nook under mezzanine office or loft space Select high end proportionally accurate furniture in styles such as minimalist Japandi industrial luxury or modern organic using materials like boucle leather and matte metals Ensure spatial balance maintaining openness circulation flow and visual hierarchy without clutter Fourth Lighting Design and Ambience Develop a layered lighting strategy that enhances natural light Include architectural lighting such as hidden warm LED strips in ceiling coves step lighting on stairs and integrated spotlights Add statement fixtures such as linear pendants in double height spaces or modern sculptural floor lamps Fifth Final Visual Rendering Style Deliver the result as a highly detailed vivid design narrative and visualization brief using realistic descriptive language that emphasizes premium photorealistic atmosphere material textures lighting interaction shadow depth and a clean sophisticated professionally staged interior aesthetic",
+              "type": "string"
+            },
+            {
+              "id": "ec66e315-1533-48c7-8426-725515aa1ad2",
+              "name": "img-link",
+              "value": "[ADD_YOUR_INTERIOR_IMAGE_URL]",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -224,
+        1408
+      ],
+      "id": "bb1b22cf-e83d-43d9-a09d-f638c0236a25",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "content": "# Interior Design\n### (prompt-to-image)(nano-bannana)\n**prompt + img-> gen-img-request -> wait -> status -> img-link**",
+        "height": 416,
+        "width": 1600
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        1248
+      ],
+      "typeVersion": 1,
+      "id": "8390054b-c362-4fb4-95f3-98c55f592f0f",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "# Product Img\n### (prompt-to-image)(nano-bannana)\n**prompt + img-> gen-img-request -> wait -> status -> img-link**",
+        "height": 416,
+        "width": 1600
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        1712
+      ],
+      "typeVersion": 1,
+      "id": "8af438ce-cfe3-444c-a8b9-829656d218f8",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a20a7541-cd30-41b6-8235-f48d0cd04d63",
+              "name": "prompt",
+              "value": "=Create a professional multi-angle product photography grid showcasing a specific product across six distinct, structured panels in a clean product mockup format. The grid must feature identical, soft diffusion studio lighting with subtle micro-shadows throughout, set against a seamless, solid, light gray studio background. The layout will include six perspectives: a studio front hero shot, a direct back view or reverse side, a detailed side profile or alternative angle, a product open or disassembled view showing interior compartments or lining, an elevated three-quarter isometric view, and a clean top-down view. This presentation must embody a high-end commercial aesthetic with razor-sharp focus on product textures against a completely blank background featuring absolutely no text, no watermarks, and no labels.",
+              "type": "string"
+            },
+            {
+              "id": "ec66e315-1533-48c7-8426-725515aa1ad2",
+              "name": "img-link-1",
+              "value": "[ADD_YOUR_PRODUCT_IMAGE_URL_1]",
+              "type": "string"
+            },
+            {
+              "id": "214a0900-3956-46c0-ba8e-d87780ace2f5",
+              "name": "img-link-2",
+              "value": "[ADD_YOUR_PRODUCT_IMAGE_URL_2]",
+              "type": "string"
+            },
+            {
+              "id": "f1e6e2fa-c879-4d3b-a00e-a952058c5885",
+              "name": "img-link-3",
+              "value": "[ADD_YOUR_PRODUCT_IMAGE_URL_3]",
+              "type": "string"
+            },
+            {
+              "id": "3c4ec4b6-448e-4443-a559-9b5d56c15b37",
+              "name": "img-link-4",
+              "value": "[ADD_YOUR_PRODUCT_IMAGE_URL_4]",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -224,
+        1872
+      ],
+      "id": "6ddc46bf-9ee3-4d99-80db-93340390bc87",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "success",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cd4e9967-2db5-45c7-b2d1-da704179ba3b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "success"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "19aaf3e6-dc66-4186-ab9e-0a7a591cfffa",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "waiting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "waiting"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f7b8302c-938e-41ad-9d92-4ba84cdabfc7",
+                    "leftValue": "={{ $json.data.state }}",
+                    "rightValue": "fail",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        1840
+      ],
+      "id": "d4b7ade4-6e13-40bf-b32b-50e98ade780f",
+      "name": "Switch4"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "=taskId",
+              "value": "={{ $json.data.taskId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer [ADD_YOUR_HIGGSFIELD_API_KEY]"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "f4cc4ce0-4288-45ad-904a-06ade8f02658",
+      "name": "Generate Image6",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        432,
+        1872
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        1872
+      ],
+      "id": "a8a384f3-bf42-425c-afd0-1fc3961b683d",
+      "name": "Wait3",
+      "webhookId": "dbe5cfbc-e70f-4103-9524-1f49a9bfc5ec"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer [ADD_YOUR_HIGGSFIELD_API_KEY]"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"nano-banana-2\",\n  \"callBackUrl\": \"https://your-domain.com/api/callback\",\n  \"input\": {\n    \"prompt\": \"{{ $json.prompt }}\",\n    \"image_input\": [\"{{ $json['img-link-1'] }}\", \"{{ $json['img-link-2'] }}\", \"{{ $json['img-link-3'] }}\", \"{{ $json['img-link-4'] }}\"],\n    \"aspect_ratio\": \"auto\",\n    \"resolution\": \"1K\",\n    \"output_format\": \"png\"\n  }\n} ",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "d43d6bb2-842f-49e8-97af-ffbaf711e2fd",
+      "name": "Generate Image1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        1872
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Product imgs\n### (script-to-Image)(gpt-image-2)\n**prompt -> gen-img -> base64-to-img**",
+        "height": 416,
+        "width": 1600,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        784,
+        -1920
+      ],
+      "typeVersion": 1,
+      "id": "b57c58c7-d7bd-4487-b093-38444f409801",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/generations",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-2"
+            },
+            {
+              "name": "prompt",
+              "value": "Clean educational technical illustration, hand-drawn ink style on lined notebook paper, centered subject: {s22-ultra-mobo}. The object is shown in a clear 3/4 perspective or side view, simplified engineering diagram style with precise outlines and minimal shading. Add numbered callouts pointing to key components (1, 2, 3, 4, etc.) with thin arrows. Include a structured legend below the drawing explaining each labeled part in short clear definitions. Title at the top in uppercase: \"PARTS OF A {s22-ultra-mobo}\". Use consistent blue pen ink style, clean line work, educational schematic aesthetic, highly legible, organized spacing, minimal artistic noise, no photorealism, no background clutter, notebook paper texture visible, technical diagram, instructional infographic style, professional engineering sketch quality."
+            },
+            {
+              "name": "quality",
+              "value": "high"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0da3feb6-bd4e-482e-8a1e-7d3a7a37fcbf",
+      "name": "gen-img6",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1152,
+        -1776
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "[ADD_YOUR_OPENAI_CREDENTIAL_ID]",
+          "name": "OpenAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "xImage-gen",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2656,
+        -1232
+      ],
+      "id": "2a8193bf-96b6-4055-940f-01065be05306",
+      "name": "Webhook",
+      "webhookId": "81ce374f-78d1-4262-9120-d56bee0e2c67"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.data.resultJson }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        3792,
+        48
+      ],
+      "id": "27b3bfae-9909-4745-a9c5-fc6f51dbf177",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Generate Image3": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Generate Image4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image4": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Generate Image3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sm-post": {
+      "main": [
+        [
+          {
+            "node": "gen-img",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt-40-mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "sm-post",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "edit-prompt",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gen-img": {
+      "main": [
+        [
+          {
+            "node": "base64-to-png",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "base64-to-png": {
+      "main": [
+        [
+          {
+            "node": "Upload to Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "get-status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "gen-video": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get-status": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "gen-video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gen-img1": {
+      "main": [
+        [
+          {
+            "node": "base64-to-png",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gen-img2": {
+      "main": [
+        [
+          {
+            "node": "base64-to-png",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields6": {
+      "main": [
+        [
+          {
+            "node": "gen-img2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gen-img3": {
+      "main": [
+        [
+          {
+            "node": "base64-to-png",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "edit-prompt": {
+      "main": [
+        [
+          {
+            "node": "gen-img3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields7": {
+      "main": [
+        [
+          {
+            "node": "gen-img4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gen-img4": {
+      "main": [
+        [
+          {
+            "node": "base64-to-png",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields8": {
+      "main": [
+        [
+          {
+            "node": "sm-post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gen-img5": {
+      "main": [
+        [
+          {
+            "node": "base64-to-png",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields9": {
+      "main": [
+        [
+          {
+            "node": "gen-img5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields9",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields7",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "gen-img1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Upload to Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Generate Image5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image5": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Generate Image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch4": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image6": {
+      "main": [
+        [
+          {
+            "node": "Switch4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Generate Image6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image1": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "648e6dff7ef94cb3d42309a56a3401197b3ada3608c31af12d0e2e5ee98ba3df"
+  }
+}
