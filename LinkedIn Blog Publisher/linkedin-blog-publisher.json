@@ -1,0 +1,223 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Blog-Publisher",
+        "formDescription": "Enter your text and it will be published on LinkedIn with a fine image",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "text",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "target-audience",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Image",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ff166d89-be50-4686-852e-74bd40048a96",
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -16,
+        208
+      ],
+      "webhookId": "0e0691a7-cb64-43d8-8c4a-17abc692b047"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Use the provided input image of the person as the base. Keep the person's identity, facial features, and overall appearance unchanged.\nCreate a cinematic, photorealistic lifestyle scene based on the following message:\n[{{ $json.text }} targeting {{ $json['target-audience'] }}]\nVisual Foundation: Hyper-realistic photography style, natural soft diffused lighting slightly moody, warm-neutral color grading with slight desaturation, shallow depth of field subject in sharp focus background slightly blurred, realistic environment that matches the context.\nEmotional Storytelling: Adjust the subject posture facial expression and body language to reflect the meaning of [{{ $json.text }} targeting {{ $json['target-audience'] }}]. The emotion must feel natural and candid not posed. Focus on a single clear emotional state.\nDynamic Visual Metaphor: Translate the meaning of [{{ $json.text }} targeting {{ $json['target-audience'] }}] into a strong visual metaphor. Add floating elements such as UI icons short text fragments symbols or abstract shapes.\nSmart Content Adaptation: stress or overload use dense chaotic swirling elements. Focus or productivity use clean minimal organized elements. Growth or success use upward movement expanding elements. Confusion use scattered irregular blurred elements. Clarity use balanced centered minimal composition.\nIntegration and Realism: all elements blend naturally, match lighting shadows reflections perspective, avoid cartoon or artificial look.\nOutput Style: Cinematic emotional photorealistic with augmented reality overlay, clean editorial composition for social media, high detail 4K quality.\nDo NOT add any text words letters or writing anywhere on the image.",
+        "options": {
+          "systemMessage": "Your only job is to fill in the placeholders inside the brackets [] in the given prompt template to reflect the meanings you extracts from the blog text and target audience. Return only the completed prompt text (english-only), exactly as structured. No explanations, no comments, no extra text — just the final prompt no icons and ready for image generation."
+        }
+      },
+      "id": "a7701681-617f-4218-b48d-79b8847e6c3f",
+      "name": "refine-text",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseFormat": "text"
+        }
+      },
+      "id": "1f1ecc47-0b28-4ac2-b1f0-d2afe15769f2",
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        224,
+        496
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "[ADD_YOUR_OPENROUTER_CREDENTIAL_ID]",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "b4131e44-eca8-4381-9f9b-86457b557c3b",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        576,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/generations",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-1.5"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "quality",
+              "value": "high"
+            },
+            {
+              "name": "size",
+              "value": "1024x1024"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cfe7e19a-143f-4f2e-9747-bf6b47bcbe62",
+      "name": "Generate Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        816,
+        224
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "[ADD_YOUR_OPENAI_CREDENTIAL_ID]",
+          "name": "OpenAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data[0].b64_json",
+        "options": {}
+      },
+      "id": "7d579436-b131-4342-b69a-79a85b5e936b",
+      "name": "base64 to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1008,
+        224
+      ]
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "refine-text",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "refine-text": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "refine-text",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image": {
+      "main": [
+        [
+          {
+            "node": "base64 to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "base64 to File": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "[YOUR_N8N_INSTANCE_ID]"
+  }
+}
